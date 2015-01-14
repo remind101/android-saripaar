@@ -16,10 +16,14 @@ package com.mobsandgeeks.saripaar;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.TextView;
 
@@ -63,6 +67,9 @@ public class Validator {
     private Map<String, Object> mProperties = new HashMap<String, Object>();
     private AsyncTask<Void, Void, List<ViewErrorPair>> mAsyncValidationTask;
     private ValidationListener mValidationListener;
+    private static DefaultErrorMessages messages = new DefaultErrorMessages();
+    private Resources.Theme theme;
+    private int errorMessagesStyle;
 
     /**
      * Private constructor. Cannot be instantiated.
@@ -78,27 +85,33 @@ public class Validator {
             throw new IllegalArgumentException("'controller' cannot be null");
         }
         mController = fragment;
+        theme = fragment.getActivity().getTheme();
         initForm();
 
     }
 
-    public <F extends Fragment> Validator(F fragment) {
+    public <F extends Fragment> Validator(F fragment, int errorMessagesStyle) {
         this();
         if (fragment == null) {
             throw new IllegalArgumentException("'controller' cannot be null");
         }
         mController = fragment;
+        this.errorMessagesStyle = errorMessagesStyle;
+        this.theme = fragment.getActivity().getTheme();
         initForm();
     }
 
-    public <A extends Activity> Validator(A activity) {
+    public <A extends Activity> Validator(A activity, int errorMessagesStyle) {
         this();
         if (activity == null) {
             throw new IllegalArgumentException("'controller' cannot be null");
         }
         mController = activity;
+        this.errorMessagesStyle = errorMessagesStyle;
+        this.theme = activity.getTheme();
         initForm();
     }
+
 
     private void initForm() {
         new AsyncTask<Void, Void, Void>() {
@@ -110,6 +123,7 @@ public class Validator {
 
             @Override
             protected Void doInBackground(Void... params) {
+                readDefaultErrorMessages();
                 createRulesFromAnnotations(getSaripaarAnnotatedFields());
                 return null;
             }
@@ -122,6 +136,35 @@ public class Validator {
                 }
             }
         }.execute();
+    }
+
+    public void readDefaultErrorMessages() {
+        TypedArray a = null;
+        try {
+            if (errorMessagesStyle > 0) {
+                a = theme.obtainStyledAttributes(errorMessagesStyle, R.styleable.DefaultErrorStings);//getting the style if specified
+            } else {
+                TypedValue outValue = new TypedValue();
+                theme.resolveAttribute(R.attr.DefaultErrorStringsStyle, outValue, true);//getting reference to actual style for error codes
+                a = theme.obtainStyledAttributes(outValue.data, R.styleable.DefaultErrorStings);//getting the style and read attributes
+            }
+            messages.setRequireRuleMessage(a.getString(R.styleable.DefaultErrorStings_requiredRule));
+            messages.setRegExRuleMessage(a.getString(R.styleable.DefaultErrorStings_regExRule));
+            messages.setTextRuleMessage(a.getString(R.styleable.DefaultErrorStings_textRule));
+            messages.setPasswordRuleMessage(a.getString(R.styleable.DefaultErrorStings_passwordRule));
+            messages.setConfirmPasswordRuleMessage(a.getString(R.styleable.DefaultErrorStings_confirmPasswordRule));
+            messages.setNumberRuleMessage(a.getString(R.styleable.DefaultErrorStings_numberRule));
+            messages.setIpAddressRuleMessage(a.getString(R.styleable.DefaultErrorStings_ipAddressRule));
+            messages.setEmailRuleMessage(a.getString(R.styleable.DefaultErrorStings_emailRule));
+        } finally {
+            if (a != null) {
+                a.recycle();
+            }
+        }
+    }
+
+    public static DefaultErrorMessages getMessages() {
+        return messages;
     }
 
     //Bundle[{email=has already been taken}]
