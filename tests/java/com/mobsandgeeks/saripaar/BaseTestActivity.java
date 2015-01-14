@@ -30,7 +30,7 @@ public class BaseTestActivity extends Activity {
         textViewRequired = new TextView(this);
         addTestView(textViewRequired);
         setContentView(rootView);
-        validator = new Validator(this);
+        validator = new Validator(this, 0);
     }
 
     protected void addTestView(TextView textViewRequired) {

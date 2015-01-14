@@ -16,6 +16,7 @@ package com.mobsandgeeks.saripaar;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.AsyncTask;
@@ -68,6 +69,7 @@ public class Validator {
     private ValidationListener mValidationListener;
     private static DefaultErrorMessages messages = new DefaultErrorMessages();
     private Resources.Theme theme;
+    private int errorMessagesStyle;
 
     /**
      * Private constructor. Cannot be instantiated.
@@ -88,23 +90,25 @@ public class Validator {
 
     }
 
-    public <F extends Fragment> Validator(F fragment) {
+    public <F extends Fragment> Validator(F fragment, int errorMessagesStyle) {
         this();
         if (fragment == null) {
             throw new IllegalArgumentException("'controller' cannot be null");
         }
         mController = fragment;
-        theme = fragment.getActivity().getTheme();
+        this.errorMessagesStyle = errorMessagesStyle;
+        this.theme = fragment.getActivity().getTheme();
         initForm();
     }
 
-    public <A extends Activity> Validator(A activity) {
+    public <A extends Activity> Validator(A activity, int errorMessagesStyle) {
         this();
         if (activity == null) {
             throw new IllegalArgumentException("'controller' cannot be null");
         }
         mController = activity;
-        theme = activity.getTheme();
+        this.errorMessagesStyle = errorMessagesStyle;
+        this.theme = activity.getTheme();
         initForm();
     }
 
@@ -137,9 +141,13 @@ public class Validator {
     public void readDefaultErrorMessages() {
         TypedArray a = null;
         try {
-            TypedValue outValue = new TypedValue();
-            theme.resolveAttribute(R.attr.DefaultErrorStingsStyle, outValue, true);//getting reference to actual style for error codes
-            a = theme.obtainStyledAttributes(outValue.data, R.styleable.DefaultErrorStings);//getting the style and read attributes
+            if (errorMessagesStyle > 0) {
+                a = theme.obtainStyledAttributes(errorMessagesStyle, R.styleable.DefaultErrorStings);//getting the style if specified
+            } else {
+                TypedValue outValue = new TypedValue();
+                theme.resolveAttribute(R.attr.DefaultErrorStringsStyle, outValue, true);//getting reference to actual style for error codes
+                a = theme.obtainStyledAttributes(outValue.data, R.styleable.DefaultErrorStings);//getting the style and read attributes
+            }
             messages.setRequireRuleMessage(a.getString(R.styleable.DefaultErrorStings_requiredRule));
             messages.setRegExRuleMessage(a.getString(R.styleable.DefaultErrorStings_regExRule));
             messages.setTextRuleMessage(a.getString(R.styleable.DefaultErrorStings_textRule));

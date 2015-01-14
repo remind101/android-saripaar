@@ -2,7 +2,7 @@
 <resources>
 
     <declare-styleable name="DefaultErrorStingsTheme">
-        <attr name="DefaultErrorStingsStyle" format="reference" />
+        <attr name="DefaultErrorStringsStyle" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="DefaultErrorStings">
