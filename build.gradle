@@ -11,7 +11,9 @@ dependencies {
 android {
     compileSdkVersion compileSdkVersionValue
     buildToolsVersion buildToolsVersionValue
-
+    lintOptions {
+        warning 'LongLogTag'
+    }
     defaultConfig {
         minSdkVersion 4
         targetSdkVersion compileSdkVersionValue
