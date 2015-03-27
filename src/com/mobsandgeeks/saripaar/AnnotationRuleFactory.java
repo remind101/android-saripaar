@@ -159,7 +159,7 @@ class AnnotationRuleFactory {
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         } catch (ClassCastException e) {
             e.printStackTrace();
         }
