@@ -8,9 +8,10 @@ buildscript {
     }
 }
 
+apply plugin: 'com.github.dcendents.android-maven'  
 apply plugin: 'com.android.library'
 
-group 'com.mobsandgeeks'
+group 'com.github.remind101'
 def version = '1.0.5'
 def versionCodeIncrement = 2
 
